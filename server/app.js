@@ -3,8 +3,6 @@ const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 const PORT = 5012;
 const data = require("./package.json");
-// const cohorts = require("./cohorts.json");
-// const students = require("./students.json");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
@@ -27,8 +25,8 @@ mongoose
 // ...
 app.use(
   cors({
-    // Add the URLs of allowed origins to this array
-    origin: ['http://localhost:5173'],
+    // Add the URLs of allowed origins to this array 
+    origin: ['http://localhost:5173'], 
   })
 );
 
@@ -45,13 +43,6 @@ app.use(cookieParser());
 app.get("/docs", (req, res) => {
   res.sendFile(__dirname + "/views/docs.html");
 });
-
-// app.get("/api/cohorts", (req, res) => {
-//   res.json(cohort);
-// });
-// app.get("/api/students", (req, res) => {
-//   res.json(students);
-// })
 
 ////////////////Create Schema
 
@@ -93,13 +84,38 @@ const studentsSchema = new Schema({
 
 
 ///////////////Create Models
-const cohorts = mongoose.model("Cohorts", cohortsSchema)
-const students = mongoose.model("Students", studentsSchema);
+const Cohort = mongoose.model("Cohort", cohortsSchema)
+const Student = mongoose.model("Student", studentsSchema);
 
-//GET REQUEST
-// GET  /books - Retrieve all books from the database
+///////Student Routes
+
+app.post("/students", (req, res) => {
+
+  Student.create({
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    email: req.body.email,
+    phone: req.body.phone,
+    linkedinUrl: req.body.linkedinUrl,
+    languages: req.body.languages,
+    program: req.body.program,
+    background: req.body.background,
+    image: req.body.image,
+    projects: req.body.projects,
+    cohort: req.body.cohort
+  })
+    .then((createdStudent) => {
+      console.log("Retrieved books ->", createdStudent);
+      res.status(201).json(createdStudent);
+    })
+    .catch((error) => {
+      console.error("Error while creating Student ->", error);
+      res.status(500).json({ error: "Failed to create Students" });
+    });
+});
+
 app.get("/students", (req, res) => {
-  students.find({})
+  Student.find({})
     .then((students) => {
       console.log("Retrieved books ->", students);
       res.status(200).json(students);
@@ -110,8 +126,86 @@ app.get("/students", (req, res) => {
     });
 });
 
+
+app.get("/students/cohort/:cohortId", (req, res) => {
+
+  let cohortId = req.params.id;
+
+  console.log("cohortId")
+  console.log(cohortId)
+  console.log("cohortId")
+
+  Student.find({cohortId: cohortId})
+    .populate("cohort")
+    .then((cohorts) => {
+      console.log("Retrieved books ->", cohorts);
+      res.status(200).json(cohorts);
+    })
+    .catch((error) => {
+      console.error("Error while retrieving Students ->", error);
+      res.status(500).json({ error: "Failed to retrieve Students" });
+    });
+    
+});
+
+
+//get
+app.get("/students/:studentId", (req, res) => {
+
+  const studentId = req.params.id;
+
+  Student.find({studentId})
+    .then((student) => {
+      console.log("Retrieved student ->", student);
+      res.status(200).json(student);
+    })
+    .catch((error) => {
+      console.error("Error while retrieving Students ->", error);
+      res.status(500).json({ error: "Failed to retrieve Students" });
+    });
+});
+
+//update
+app.put("/students/:studentId", (req, res, next) => {
+
+  const {studentId} = req.params;
+
+  console.log("StudentID" + studentId);
+  const newDetails = req.body;
+
+  Student.findByIdAndUpdate(studentId, newDetails, {new: true})
+    .then((student) => {
+      console.log("Updated student ->", student);
+      res.status(200).json(student);
+    })
+    .catch((error) => {
+      console.error("Error while updating Students ->", error);
+      res.status(500).json({ error: "Failed to update Students" });
+    });
+});
+
+//Delete
+app.delete("/students/:studentId", (req, res, next) => {
+
+  const {studentId} = req.params;
+
+  console.log("StudentID" + studentId);
+
+  Student.findByIdAndDelete(studentId)
+    .then((result) => {
+      console.log("Deleted student ->", result);
+      res.status(200).json(result);
+    })
+    .catch((error) => {
+      console.error("Error while deleting Students ->", error);
+      res.status(500).json({ error: "Failed to delete Students" });
+    });
+});
+
+
+///////Cohorts Routes
 app.get("/cohorts", (req, res) => {
-  cohorts.find({})
+  Cohort.find({})
     .then((cohorts) => {
       console.log("Retrieved books ->", cohorts);
       res.status(200).json(cohorts);
@@ -122,7 +216,87 @@ app.get("/cohorts", (req, res) => {
     });
 });
 
+//create
+app.post("/cohorts", (req, res) => {
+
+  Cohort.create({
+    inProgress: req.body.inProgress,
+    cohortSlug: req.body.cohortSlug,
+    cohortName: req.body.cohortName,
+    program: req.body.program,
+    campus: req.body.campus,
+    startDate: req.body.startDate,
+    endDate: req.body.endDate,
+    programManager: req.body.programManager,
+    leadTeacher: req.body.leadTeacher,
+    totalHours: req.body.totalHours
+  })
+    .then((createdCohort) => {
+      console.log("Created Cohort ->", createdCohort);
+      res.status(201).json(createdCohort);
+    })
+    .catch((error) => {
+      console.error("Error while creating Cohort ->", error);
+      res.status(500).json({ error: "Failed to create Cohort" });
+    });
+});
+
+//get
+app.get("/cohorts/:cohortId", (req, res) => {
+
+  const cohortId = req.params.id;
+
+  Cohort.find({cohortId})
+    .then((cohorts) => {
+      console.log("Retrieved cohort by id ->", cohorts);
+      res.status(200).json(cohorts);
+    })
+    .catch((error) => {
+      console.error("Error while retrieving cohorts ->", error);
+      res.status(500).json({ error: "Failed to retrieve cohorts" });
+    });
+});
+
+// //update
+app.put("/cohorts/:cohortId", (req, res, next) => {
+
+  const {cohortId} = req.params;
+
+  console.log("CohortID" + cohortId);
+  const newDetails = req.body;
+
+  Cohort.findByIdAndUpdate(cohortId, newDetails, {new: true})
+    .then((cohorts) => {
+      console.log("Updated cohort ->", cohorts);
+      res.status(200).json(cohorts);
+    })
+    .catch((error) => {
+      console.error("Error while updating cohort ->", error);
+      res.status(500).json({ error: "Failed to update cohort" });
+    });
+});
+
+//Delete
+app.delete("/cohorts/:cohortId", (req, res, next) => {
+
+  const {cohortId} = req.params;
+
+  console.log("CohortID" + cohortId);
+
+  Cohort.findByIdAndDelete(cohortId)
+    .then((result) => {
+      console.log("Deleted cohort ->", result);
+      res.status(200).json(result);
+    })
+    .catch((error) => {
+      console.error("Error while deleting cohort ->", error);
+      res.status(500).json({ error: "Failed to delete cohort" });
+    });
+});
+
 // START SERVER
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
+
+module.exports = app;
