@@ -115,7 +115,10 @@ app.post("/students", (req, res) => {
 });
 
 app.get("/students", (req, res) => {
-  Student.find({})
+  const studentID = req.params.id;
+  
+  Student.find(studentID)
+  .populate("cohort")
     .then((students) => {
       console.log("Retrieved books ->", students);
       res.status(200).json(students);
