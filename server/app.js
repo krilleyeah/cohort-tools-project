@@ -6,6 +6,7 @@ const data = require("./package.json");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const {errorHandler, notFoundHandler} = require("../server/middleware/error-handling")
 
 // STATIC DATA
 // Devs Team - Import the provided files with JSON data of students and cohorts here:
@@ -89,7 +90,7 @@ const Student = mongoose.model("Student", studentsSchema);
 
 ///////Student Routes
 
-app.post("/students", (req, res) => {
+app.post("/students", (req, res, next) => {
 
   Student.create({
     firstName: req.body.firstName,
@@ -110,11 +111,13 @@ app.post("/students", (req, res) => {
     })
     .catch((error) => {
       console.error("Error while creating Student ->", error);
-      res.status(500).json({ error: "Failed to create Students" });
+      next(error);
+
+      // res.status(500).json({ error: "Failed to create Students" });
     });
 });
 
-app.get("/students", (req, res) => {
+app.get("/students", (req, res, next) => {
   const studentID = req.params.id;
   
   Student.find(studentID)
@@ -125,18 +128,17 @@ app.get("/students", (req, res) => {
     })
     .catch((error) => {
       console.error("Error while retrieving Students ->", error);
-      res.status(500).json({ error: "Failed to retrieve Students" });
+      next(error);
+      // res.status(500).json({ error: "Failed to retrieve Students" });
     });
+
 });
 
 
-app.get("/students/cohort/:cohortId", (req, res) => {
+app.get("/students/cohort/:cohortId", (req, res, next) => {
 
   let cohortId = req.params.id;
 
-  console.log("cohortId")
-  console.log(cohortId)
-  console.log("cohortId")
 
   Student.find({cohortId: cohortId})
     .populate("cohort")
@@ -146,14 +148,16 @@ app.get("/students/cohort/:cohortId", (req, res) => {
     })
     .catch((error) => {
       console.error("Error while retrieving Students ->", error);
-      res.status(500).json({ error: "Failed to retrieve Students" });
+      next(error);
+
+      // res.status(500).json({ error: "Failed to retrieve Students" });
     });
     
 });
 
 
 //get
-app.get("/students/:studentId", (req, res) => {
+app.get("/students/:studentId", (req, res, next) => {
 
   const studentId = req.params.id;
 
@@ -165,7 +169,9 @@ app.get("/students/:studentId", (req, res) => {
     })
     .catch((error) => {
       console.error("Error while retrieving Students ->", error);
-      res.status(500).json({ error: "Failed to retrieve Students" });
+      next(error);
+
+      // res.status(500).json({ error: "Failed to retrieve Students" });
     });
 });
 
@@ -184,7 +190,9 @@ app.put("/students/:studentId", (req, res, next) => {
     })
     .catch((error) => {
       console.error("Error while updating Students ->", error);
-      res.status(500).json({ error: "Failed to update Students" });
+      next(error);
+
+      // res.status(500).json({ error: "Failed to update Students" });
     });
 });
 
@@ -202,13 +210,15 @@ app.delete("/students/:studentId", (req, res, next) => {
     })
     .catch((error) => {
       console.error("Error while deleting Students ->", error);
-      res.status(500).json({ error: "Failed to delete Students" });
+      next(error);
+
+      // res.status(500).json({ error: "Failed to delete Students" });
     });
 });
 
 
 ///////Cohorts Routes
-app.get("/cohorts", (req, res) => {
+app.get("/cohorts", (req, res, next) => {
   Cohort.find({})
     .then((cohorts) => {
       console.log("Retrieved books ->", cohorts);
@@ -216,12 +226,14 @@ app.get("/cohorts", (req, res) => {
     })
     .catch((error) => {
       console.error("Error while retrieving Students ->", error);
-      res.status(500).json({ error: "Failed to retrieve Students" });
+      next(error);
+
+      // res.status(500).json({ error: "Failed to retrieve Students" });
     });
 });
 
 //create
-app.post("/cohorts", (req, res) => {
+app.post("/cohorts", (req, res, next) => {
 
   Cohort.create({
     inProgress: req.body.inProgress,
@@ -241,12 +253,14 @@ app.post("/cohorts", (req, res) => {
     })
     .catch((error) => {
       console.error("Error while creating Cohort ->", error);
-      res.status(500).json({ error: "Failed to create Cohort" });
+      next(error);
+
+      // res.status(500).json({ error: "Failed to create Cohort" });
     });
 });
 
 //get
-app.get("/cohorts/:cohortId", (req, res) => {
+app.get("/cohorts/:cohortId", (req, res, next) => {
 
   const cohortId = req.params.id;
 
@@ -257,7 +271,9 @@ app.get("/cohorts/:cohortId", (req, res) => {
     })
     .catch((error) => {
       console.error("Error while retrieving cohorts ->", error);
-      res.status(500).json({ error: "Failed to retrieve cohorts" });
+      next(error);
+
+      // res.status(500).json({ error: "Failed to retrieve cohorts" });
     });
 });
 
@@ -276,7 +292,9 @@ app.put("/cohorts/:cohortId", (req, res, next) => {
     })
     .catch((error) => {
       console.error("Error while updating cohort ->", error);
-      res.status(500).json({ error: "Failed to update cohort" });
+      next(error);
+
+      // res.status(500).json({ error: "Failed to update cohort" });
     });
 });
 
@@ -294,13 +312,20 @@ app.delete("/cohorts/:cohortId", (req, res, next) => {
     })
     .catch((error) => {
       console.error("Error while deleting cohort ->", error);
-      res.status(500).json({ error: "Failed to delete cohort" });
+      next(error);
+
+      // res.status(500).json({ error: "Failed to delete cohort" });
     });
 });
 
 // START SERVER
+app.use(notFoundHandler);
+app.use(errorHandler);
+
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
+
+
 
 module.exports = app;
