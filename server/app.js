@@ -158,6 +158,7 @@ app.get("/students/:studentId", (req, res) => {
   const studentId = req.params.id;
 
   Student.find({studentId})
+  .populate("cohort")
     .then((student) => {
       console.log("Retrieved student ->", student);
       res.status(200).json(student);
