@@ -7,6 +7,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const {errorHandler, notFoundHandler} = require("../server/middleware/error-handling")
+const { isAuthenticated } = require("./middleware/jwt.middleware") 
 
 // STATIC DATA
 // Devs Team - Import the provided files with JSON data of students and cohorts here:
@@ -45,7 +46,9 @@ app.get("/docs", (req, res) => {
   res.sendFile(__dirname + "/views/docs.html");
 });
 
-////////////////Create Schema
+////////
+////////////////Create Schemas
+///////
 
 //Cohort
 const cohortsSchema = new Schema({
@@ -82,13 +85,14 @@ const studentsSchema = new Schema({
 )
 
 
+/////////Create Models
 
-
-///////////////Create Models
-const Cohort = mongoose.model("Cohort", cohortsSchema)
+const Cohort = mongoose.model("Cohort", cohortsSchema);
 const Student = mongoose.model("Student", studentsSchema);
 
+/////////
 ///////Student Routes
+////////
 
 app.post("/students", (req, res, next) => {
 
@@ -156,7 +160,7 @@ app.get("/students/cohort/:cohortId", (req, res, next) => {
 });
 
 
-//get
+////get
 app.get("/students/:studentId", (req, res, next) => {
 
   const studentId = req.params.id;
@@ -175,7 +179,7 @@ app.get("/students/:studentId", (req, res, next) => {
     });
 });
 
-//update
+////update
 app.put("/students/:studentId", (req, res, next) => {
 
   const {studentId} = req.params;
@@ -196,7 +200,7 @@ app.put("/students/:studentId", (req, res, next) => {
     });
 });
 
-//Delete
+////delete
 app.delete("/students/:studentId", (req, res, next) => {
 
   const {studentId} = req.params;
@@ -259,7 +263,7 @@ app.post("/cohorts", (req, res, next) => {
     });
 });
 
-//get
+////get
 app.get("/cohorts/:cohortId", (req, res, next) => {
 
   const cohortId = req.params.id;
@@ -277,7 +281,7 @@ app.get("/cohorts/:cohortId", (req, res, next) => {
     });
 });
 
-// //update
+////update
 app.put("/cohorts/:cohortId", (req, res, next) => {
 
   const {cohortId} = req.params;
@@ -298,7 +302,7 @@ app.put("/cohorts/:cohortId", (req, res, next) => {
     });
 });
 
-//Delete
+////delete
 app.delete("/cohorts/:cohortId", (req, res, next) => {
 
   const {cohortId} = req.params;
@@ -318,14 +322,24 @@ app.delete("/cohorts/:cohortId", (req, res, next) => {
     });
 });
 
-// START SERVER
+//////////
+////Mount Routers
+/////////
+const authRouter = require("./routes/auth.routes.js");
+app.use("/auth", authRouter);
+
+const userRouter = require("./routes/user.routes.js");
+app.use("/api", isAuthenticated, userRouter);
+
+
+///Error handling middleware
 app.use(notFoundHandler);
 app.use(errorHandler);
 
+// START SERVER
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
-
 
 
 module.exports = app;
