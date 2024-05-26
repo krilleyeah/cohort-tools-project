@@ -10,6 +10,8 @@ const User = require("../models/User.model")
 const { isAuthenticated } = require("../middleware/jwt.middleware") 
 const router = require("express").Router();
 const saltRounds = 10;
+const express = require("../models/User.model")
+
 
 ///////////
 //POST /auth/signup Creates a new user in the database SIGN UP
