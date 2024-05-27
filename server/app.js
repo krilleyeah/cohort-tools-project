@@ -94,7 +94,7 @@ const Student = mongoose.model("Student", studentsSchema);
 ///////Student Routes
 ////////
 
-app.post("/students", (req, res, next) => {
+app.post("/api/students", (req, res, next) => {
 
   Student.create({
     firstName: req.body.firstName,
@@ -139,7 +139,7 @@ app.get("/students", (req, res, next) => {
 });
 
 
-app.get("/students/cohort/:cohortId", (req, res, next) => {
+app.get("/api/students/cohort/:cohortId", (req, res, next) => {
 
   let cohortId = req.params.id;
 
@@ -161,7 +161,7 @@ app.get("/students/cohort/:cohortId", (req, res, next) => {
 
 
 ////get
-app.get("/students/:studentId", (req, res, next) => {
+app.get("/api/students/:studentId", (req, res, next) => {
 
   const studentId = req.params.id;
 
@@ -180,7 +180,7 @@ app.get("/students/:studentId", (req, res, next) => {
 });
 
 ////update
-app.put("/students/:studentId", (req, res, next) => {
+app.put("/api/students/:studentId", (req, res, next) => {
 
   const {studentId} = req.params;
 
@@ -201,7 +201,7 @@ app.put("/students/:studentId", (req, res, next) => {
 });
 
 ////delete
-app.delete("/students/:studentId", (req, res, next) => {
+app.delete("/api/students/:studentId", (req, res, next) => {
 
   const {studentId} = req.params;
 
@@ -222,7 +222,8 @@ app.delete("/students/:studentId", (req, res, next) => {
 
 
 ///////Cohorts Routes
-app.get("/cohorts", (req, res, next) => {
+app.get("/api/cohorts", (req, res, next) => {
+
   Cohort.find({})
     .then((cohorts) => {
       console.log("Retrieved books ->", cohorts);
@@ -237,7 +238,7 @@ app.get("/cohorts", (req, res, next) => {
 });
 
 //create
-app.post("/cohorts", (req, res, next) => {
+app.post("/api/cohorts", (req, res, next) => {
 
   Cohort.create({
     inProgress: req.body.inProgress,
@@ -264,7 +265,7 @@ app.post("/cohorts", (req, res, next) => {
 });
 
 ////get
-app.get("/cohorts/:cohortId", (req, res, next) => {
+app.get("/api/cohorts/:cohortId", (req, res, next) => {
 
   const cohortId = req.params.id;
 
@@ -282,7 +283,7 @@ app.get("/cohorts/:cohortId", (req, res, next) => {
 });
 
 ////update
-app.put("/cohorts/:cohortId", (req, res, next) => {
+app.put("/api/cohorts/:cohortId", (req, res, next) => {
 
   const {cohortId} = req.params;
 
@@ -303,7 +304,7 @@ app.put("/cohorts/:cohortId", (req, res, next) => {
 });
 
 ////delete
-app.delete("/cohorts/:cohortId", (req, res, next) => {
+app.delete("/api/cohorts/:cohortId", (req, res, next) => {
 
   const {cohortId} = req.params;
 

@@ -1,8 +1,7 @@
 
 const path = require('path');
-const dotenvPath = path.resolve(__dirname, '../../.env'); // Construct the correct path to the .env file
 
-require('dotenv').config({ path: dotenvPath }); // Load the environment variables from the .env file
+require('dotenv').config(); // Load the environment variables from the .env file
 
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
